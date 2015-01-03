@@ -5,15 +5,15 @@ $fn=render?35:15;
 
 wallRibDepth=15;
 wallRibDiameter=32;
-hookDepth=8;
-hookOffset=1;
+hookDepth=8; 
+hookOffset=0.75;
 
 wallPipeOuterDiameter=41.8; 
 wallPipeInnerDiameter=41; 
 
 
 exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack - fits perfectly!
-exitPipeInsideDepth=7; // measured at 8, but changed after fitting it
+exitPipeInsideDepth=5; 
 
 ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=10;
@@ -26,6 +26,7 @@ epsilon=0.001;
 rotateXForPrinting=render?180:0;
 
 numberOfPillars=20;
+numberOfCuts=16;
 supportRingHeight=0.5;
 
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
@@ -57,9 +58,17 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         }
         
         // cut away to make hooks
+        for(i=[0:numberOfCuts-1]) {        
+            rotate(360*((i+0)/numberOfCuts)) {
+               translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
+             cube([12,2,wallRibDepth-ourPipeInsideLength+hookDepth+supportRingHeight]);
+            }
+        }   
+
+        /*
         translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
-            cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
-        +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
+        colour("blue")    cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
+        +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);*/
     }
 
     // ourPipeInside airodinamics   
@@ -69,10 +78,9 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
              h=ourPipeInsideLength/2,t1=ourPipeInsideThickness,
         , t2=hookOffset/2);
 
-
-    
     
     // some manual support  - rather just cut small slits so we can have 12 hooks    
+    /*
     for(i=[0:numberOfPillars-1]) {
         if (i%5>1 && i%5<4){
             rotate(360*((i+0)/numberOfPillars)) {
@@ -81,7 +89,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             }
         }
     }   
-    
+    */
     // add a flat base that must be cut off for the hooks for easier printing
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
                 pipe(d=wallPipeInnerDiameter,h=supportRingHeight,
@@ -90,15 +98,19 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
 }
 
 
+
+/*
 module cutaways(cubeSize, distanceFromCenter){
+    
     for (x = [-distanceFromCenter, distanceFromCenter]) {
         for (y = [-distanceFromCenter, distanceFromCenter]) {
             translate([x, y, cubeSize/2])
                 cube(size = cubeSize, center = true);
         }
     }
+    
 }
-
+*/
 
 module exitPipeThread() {
     include <threads.scad>;
