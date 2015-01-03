@@ -7,7 +7,7 @@ wallRibDepth=15;
 wallRibDiameter=32;
 
 wallPipeOuterDiameter=41.8; 
-wallPipeInnnerDiameter=41; 
+wallPipeInnerDiameter=41; 
 
 
 exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack 
@@ -16,25 +16,39 @@ exitPipeInsideDepth=8.5; // measured at 8, but make ours a bit longer
 ourPipeThickness=3;
 ourPipeOutsideTransitionLength=10;
 ourPipeOutsideLength=5;
-ourPipeInsideLength=wallRibDepth;
+ourPipeInsideLength=7.5;
 
 epsilon=0.001;
-
-
-
-  
-
-
 
 exitPipeThread();
     
 // ourPipeOutside    
 translate([0,0,exitPipeInsideDepth])        
-    pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,thickness=ourPipeThickness);  
+    pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t=ourPipeThickness);  
 
 // ourPipeOutsideTransition
 translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
-    pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,thickness=ourPipeThickness);
+    pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,t=ourPipeThickness);
+ 
+  
+difference(){
+    // ourPipeInside    
+    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
+        pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth,t=ourPipeThickness);
+    
+    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
+        cutaways(cubeSize=wallPipeInnerDiameter/2+2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
+}
+
+module cutaways(cubeSize, distanceFromCenter){
+    for (x = [-distanceFromCenter, distanceFromCenter]) {
+        for (y = [-distanceFromCenter, distanceFromCenter]) {
+            translate([x, y, cubeSize/2])
+                cube(size = cubeSize, center = true);
+        }
+    }
+}
+
 
 module exitPipeThread() {
     include <threads.scad>;
@@ -49,7 +63,10 @@ module exitPipeThread() {
     }
 }
 
-module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h,thickness) {
+/*
+t => thickness
+*/
+module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h,t,t1,t2) {
     _epsilon=0.001;
     
     R1 = r1!=undef ? r1 : r;
@@ -60,28 +77,21 @@ module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h,thickness) {
     D2 = d2!=undef ? d2 : d;    
     _R2 = D2!=undef && r2==undef ? D2/2 : R2;
     
+    T1 = t1!=undef ? t1 : t;
+    T2 = t1!=undef ? t2 : t;
+    
     echo("pipe",_R1,_R2);
     difference() {
         cylinder(r1=_R1,r2=_R2,h=h);
         translate([0,0,-_epsilon]) // translate to overlap outer
-            cylinder(r=_R1-thickness,r2=_R2-thickness,h=h+2*_epsilon);
+            cylinder(r=_R1-T1,r2=_R2-T2,h=h+2*_epsilon);
     }
 }
 
 // make a little piece of pipe that goes into the pool wall
 /*
-difference() {
-    union(){
-        // ourPipeOutside    
-        cylinder(r=exitPipeOutsideDiameter+ourPipeWidth,h=ourPipeOutsideLength);
         
-        // ourPipeOutsideTransition
-        translate([0,0,ourPipeOutsideLength])
-            cylinder(r1=exitPipeOutsideDiameter+ourPipeWidth,r2=wallPipeInsideDiameter,h=ourPipeOutsideTransitionLength);
         
-        // ourPipeInside    
-        translate([0,0,ourPipeOutsideLength+ourPipeOutsideTransitionLength])
-            cylinder(r1=wallPipeInsideR1,r2=wallPipeInsideR2,h=ourPipeInsideLength);
         
         // add hooks that can hold onto blue insert
     }
