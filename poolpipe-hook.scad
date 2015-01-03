@@ -1,20 +1,72 @@
+render=
+    //true;
+    false;
+$fn=render?35:15;
 
 wallRibDepth=15;
 wallRibDiameter=32;
 
-wallPipeInsideD1=41.8; 
-wallPipeInsideD2=41; 
+wallPipeOuterDiameter=41.8; 
+wallPipeInnnerDiameter=41; 
 
 
-exitPipeOutsideDiameter=30; //?? measure this before printing
+exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack 
+exitPipeInsideDepth=8.5; // measured at 8, but make ours a bit longer
 
-ourPipeWidth=3;
-ourPipeOutsideTransitionLength=5;
-ourPipeOutsideLength=15;
+ourPipeThickness=3;
+ourPipeOutsideTransitionLength=10;
+ourPipeOutsideLength=5;
 ourPipeInsideLength=wallRibDepth;
 
 epsilon=0.001;
 
+
+
+  
+
+
+
+exitPipeThread();
+    
+// ourPipeOutside    
+translate([0,0,exitPipeInsideDepth])        
+    pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,thickness=ourPipeThickness);  
+
+// ourPipeOutsideTransition
+translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
+    pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,thickness=ourPipeThickness);
+
+module exitPipeThread() {
+    include <threads.scad>;
+    difference() {
+        if (render) {
+            metric_thread(diameter=exitPipeInsideDiameter, pitch=2.5, length=exitPipeInsideDepth);
+        } else {
+            cylinder(d=exitPipeInsideDiameter-1,h=exitPipeInsideDepth);
+        }
+        translate([0,0,-epsilon]) // translate to overlap outer
+            cylinder(d=exitPipeInsideDiameter-ourPipeThickness*2,h=exitPipeInsideDepth+2*epsilon);
+    }
+}
+
+module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h,thickness) {
+    _epsilon=0.001;
+    
+    R1 = r1!=undef ? r1 : r;
+    D1 = d1!=undef ? d1 : d;    
+    _R1 = D1!=undef && r1==undef ? D1/2 : R1;
+    
+    R2 = r2!=undef ? r2 : r;
+    D2 = d2!=undef ? d2 : d;    
+    _R2 = D2!=undef && r2==undef ? D2/2 : R2;
+    
+    echo("pipe",_R1,_R2);
+    difference() {
+        cylinder(r1=_R1,r2=_R2,h=h);
+        translate([0,0,-_epsilon]) // translate to overlap outer
+            cylinder(r=_R1-thickness,r2=_R2-thickness,h=h+2*_epsilon);
+    }
+}
 
 // make a little piece of pipe that goes into the pool wall
 /*
@@ -55,27 +107,3 @@ difference() {
 * /
 }
 */
-  
-pipe(d=10,d2=15,h=10,thickness=5);  
-
-module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h=10,thickness=1) {
-    _epsilon=0.001;
-    
-    R1 = r1!=undef ? r1 : r;
-    D1 = d1!=undef ? d1 : d;    
-    _R1 = D1!=undef && r1==undef ? D1/2 : R1;
-    
-    R2 = r2!=undef ? r2 : r;
-    D2 = d2!=undef ? d2 : d;    
-    _R2 = D2!=undef && r2==undef ? D2/2 : R2;
-    
-    echo("pipe",_R1,_R2);
-    //if (d!=undef){
-        difference() {
-            cylinder(r1=_R1,r2=_R2,h=h);
-            translate([0,0,-_epsilon]) // translate to overlap outer
-                cylinder(r=_R1-thickness,r2=_R2-thickness,h=h+2*_epsilon);
-        }
-    //}
-}
-
