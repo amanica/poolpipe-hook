@@ -1,6 +1,6 @@
 render=
-    true;
-    //false;
+    //true;
+    false;
 $fn=render?35:15;
 
 wallRibDepth=15;
@@ -34,11 +34,12 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         
     // ourPipeOutside    
     translate([0,0,exitPipeInsideDepth])        
-        pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t=ourPipeInsideThickness);  
+        pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t=ourPipeOutsideThickness);  
 
     // ourPipeOutsideTransition
     translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
-        pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,t=ourPipeInsideThickness);
+        pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,
+    t1=ourPipeOutsideThickness, t2=ourPipeInsideThickness);
      
       
     difference(){
