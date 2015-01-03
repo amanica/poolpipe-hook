@@ -1,7 +1,7 @@
 render=
     true;
     //false;
-$fn=render?45:15;
+$fn=render?90:15;
 
 wallRibDepth=15;
 wallRibDiameter=32;
@@ -65,12 +65,12 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             //add some grip
             for(i=[0:numberOfCuts-1]) {        
                     rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
-                       translate([exitPipeInsideDiameter/2-9.5,0,
+                       translate([exitPipeInsideDiameter/2-7,0,
                         exitPipeInsideDepth+ourPipeOutsideLength])
                         difference(){
-                            sphere(r=10);
-                            rotate(25,[0,-1,0]) {
-                                translate([-4,0,0])cube([20,20,20],center=true);
+                            scale([0.75,0.75,1])sphere(r=10,$fn=$fn*2/3);
+                            rotate(22,[0,-1,0]) {
+                                translate([-5,0,0])cube([20,20,20],center=true);
                             }
                         }
                     }
