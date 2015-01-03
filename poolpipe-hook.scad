@@ -1,6 +1,6 @@
 render=
-    true;
-    //false;
+    //true;
+    false;
 $fn=render?35:15;
 
 wallRibDepth=15;
@@ -24,6 +24,8 @@ ourPipeInsideThickness=3;
 epsilon=0.001;
 
 rotateXForPrinting=render?180:0;
+
+numberOfPillars=20;
 
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
 
@@ -49,10 +51,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
                 pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
                     t1=ourPipeInsideThickness+hookOffset, t2=hookOffset);
             
-            // add a flat base that must be cut off for the hooks for easier printing
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
-                pipe(d=wallPipeInnerDiameter,h=1,
-                    t=ourPipeInsideThickness);
+            
         }
         
         // cut away to make hooks
@@ -64,8 +63,28 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
     translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
         pipe(d1=wallPipeOuterDiameter-(wallPipeOuterDiameter/wallPipeInnerDiameter)/5,
              d2=(wallPipeOuterDiameter+wallPipeInnerDiameter)/2,
-             h=ourPipeInsideThickness/2,t1=ourPipeInsideThickness,
+             h=ourPipeInsideLength/2,t1=ourPipeInsideThickness,
         , t2=hookOffset/2);
+
+
+    
+    
+    // some manual support
+    
+    for(i=[0:numberOfPillars-1]) {
+        if (i%5>1 && i%5<4){
+            rotate(360*((i+0)/numberOfPillars)) {
+               translate([wallPipeInnerDiameter/2-1.5,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
+             cube([2,2,wallRibDepth-ourPipeInsideLength+hookDepth+1]);
+            }
+        }
+    }   
+    
+    // add a flat base that must be cut off for the hooks for easier printing
+            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
+                pipe(d=wallPipeInnerDiameter,h=1,
+                    t=ourPipeInsideThickness);
+    
 }
 
 
