@@ -18,7 +18,7 @@ exitPipeInsideDepth=8.5; // measured at 8, but make ours a bit longer
 ourPipeThickness=3;
 ourPipeOutsideTransitionLength=10;
 ourPipeOutsideLength=5;
-ourPipeInsideLength=7.5;
+ourPipeInsideLength=8.5; 
 
 epsilon=0.001;
 
@@ -42,12 +42,19 @@ difference(){
         // add hooks that can hold onto blue insert       
         translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
             pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
-                t1=ourPipeThickness+hookOffset, t2=hookOffset);
+                t1=ourPipeThickness+hookOffset, t2=hookOffset/2);
     }
     
-    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
+    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
         cutaways(cubeSize=wallPipeInnerDiameter/2+2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
 }
+
+// ourPipeInside airodinamics   
+translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
+    pipe(d1=wallPipeOuterDiameter-(wallPipeOuterDiameter/wallPipeInnerDiameter)/5,
+         d2=(wallPipeOuterDiameter+wallPipeInnerDiameter)/2,
+         h=ourPipeInsideLength/2,t1=ourPipeThickness,
+    , t2=hookOffset/2);
 
 module cutaways(cubeSize, distanceFromCenter){
     for (x = [-distanceFromCenter, distanceFromCenter]) {
