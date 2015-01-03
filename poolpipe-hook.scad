@@ -1,6 +1,6 @@
 render=
-    //true;
-    false;
+    true;
+    //false;
 $fn=render?35:15;
 
 wallRibDepth=15;
@@ -12,8 +12,8 @@ wallPipeOuterDiameter=41.8;
 wallPipeInnerDiameter=41; 
 
 
-exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack 
-exitPipeInsideDepth=8.5; // measured at 8, but make ours a bit longer
+exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack - fits perfectly!
+exitPipeInsideDepth=7; // measured at 8, but changed after fitting it
 
 ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=10;
@@ -47,7 +47,12 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             // add hooks that can hold onto blue insert       
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
                 pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
-                    t1=ourPipeInsideThickness+hookOffset, t2=hookOffset/2);
+                    t1=ourPipeInsideThickness+hookOffset, t2=hookOffset);
+            
+            // add a flat base that must be cut off for the hooks for easier printing
+            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
+                pipe(d=wallPipeInnerDiameter,h=1,
+                    t=ourPipeInsideThickness);
         }
         
         // cut away to make hooks
