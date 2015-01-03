@@ -1,6 +1,6 @@
 render=
-    //true;
-    false;
+    true;
+    //false;
 $fn=render?35:15;
 
 wallRibDepth=15;
@@ -19,13 +19,14 @@ ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=10;
 ourPipeOutsideLength=5;
 ourPipeInsideLength=8.5; 
-ourPipeInsideThickness=3;
+ourPipeInsideThickness=3.5;
 
 epsilon=0.001;
 
 rotateXForPrinting=render?180:0;
 
 numberOfPillars=20;
+supportRingHeight=0.5;
 
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
 
@@ -56,7 +57,8 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         
         // cut away to make hooks
         translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
-            cutaways(cubeSize=wallPipeInnerDiameter/2+2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
+            cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
+        +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
     }
 
     // ourPipeInside airodinamics   
@@ -69,20 +71,19 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
 
     
     
-    // some manual support
-    
+    // some manual support  - rather just cut small slits so we can have 12 hooks    
     for(i=[0:numberOfPillars-1]) {
         if (i%5>1 && i%5<4){
             rotate(360*((i+0)/numberOfPillars)) {
                translate([wallPipeInnerDiameter/2-1.5,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
-             cube([2,2,wallRibDepth-ourPipeInsideLength+hookDepth+1]);
+             cube([2,2,wallRibDepth-ourPipeInsideLength+hookDepth+supportRingHeight]);
             }
         }
     }   
     
     // add a flat base that must be cut off for the hooks for easier printing
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
-                pipe(d=wallPipeInnerDiameter,h=1,
+                pipe(d=wallPipeInnerDiameter,h=supportRingHeight,
                     t=ourPipeInsideThickness);
     
 }
