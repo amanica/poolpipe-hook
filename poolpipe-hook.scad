@@ -5,6 +5,8 @@ $fn=render?35:15;
 
 wallRibDepth=15;
 wallRibDiameter=32;
+hookDepth=8;
+hookOffset=1;
 
 wallPipeOuterDiameter=41.8; 
 wallPipeInnerDiameter=41; 
@@ -32,9 +34,16 @@ translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
  
   
 difference(){
-    // ourPipeInside    
-    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
-        pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth,t=ourPipeThickness);
+    union(){
+        // ourPipeInside    
+        translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
+            pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth,t=ourPipeThickness);
+
+        // add hooks that can hold onto blue insert       
+        translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
+            pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
+                t1=ourPipeThickness+hookOffset, t2=hookOffset);
+    }
     
     translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
         cutaways(cubeSize=wallPipeInnerDiameter/2+2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);
@@ -88,32 +97,8 @@ module pipe(r=undef,r1=undef,r2=undef,d=undef,d1=undef,d2=undef,h,t,t1,t2) {
     }
 }
 
-// make a little piece of pipe that goes into the pool wall
-/*
         
         
         
-        // add hooks that can hold onto blue insert
-    }
-    
-    // ourPipeOutside    
-    translate([0,0,-epsilon]) // translate to overlap outer
-        cylinder(r=exitPipeOutsideDiameter,h=ourPipeOutsideLength + 2*epsilon);
-    
-    // ourPipeOutsideTransition
-    translate([0,0,ourPipeOutsideLength-epsilon])
-        cylinder(r1=exitPipeOutsideDiameter,r2=wallPipeInsideDiameter-ourPipeWidth,
-            h=ourPipeOutsideTransitionLength + 2*epsilon);
 
-    // ourPipeInside    
-    translate([0,0,ourPipeOutsideLength+ourPipeOutsideTransitionLength-epsilon])
-        
-        cylinder(r=wallPipeInsideDiameter-ourPipeWidth,h=ourPipeInsideLength+ 2*epsilon);
-
-    // sharpen inner pipe   
-    /*translate([0,0,ourPipeOutsideLength+ourPipeInsideLength-epsilon])
-        cylinder(r2=exitPipeOutsideDiameter,r1=wallPipeInsideDiameter-ourPipeWidth,
-            h=ourPipeOutsideTransitionLength + 2*epsilon);
-* /
-}
-*/
+    
