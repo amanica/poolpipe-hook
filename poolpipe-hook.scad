@@ -7,6 +7,7 @@ wallRibDepth=15;
 wallRibDiameter=32;
 hookDepth=8; 
 hookOffset=0.75;
+hookTipThickness=1.5; // was 1
 
 wallPipeOuterDiameter=42; //was 41.8
 wallPipeInnerDiameter=41; 
@@ -30,9 +31,7 @@ numberOfCuts=16;
 supportRingHeight=0.5;
 
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
-
-    
-        
+      
     // ourPipeOutside    
     translate([0,0,exitPipeInsideDepth])        
         pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t=ourPipeOutsideThickness);  
@@ -55,7 +54,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             // add hooks that can hold onto blue insert       
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
                 pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
-                    t1=ourPipeInsideThickness+hookOffset, t2=hookOffset);
+                    t1=ourPipeInsideThickness+hookOffset, t2=hookTipThickness);
             
             // add a flat base that must be cut off for the hooks for easier printing
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
