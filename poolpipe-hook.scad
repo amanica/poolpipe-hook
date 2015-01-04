@@ -8,7 +8,7 @@ wallRibDiameter=32;
 hookDepth=8; 
 hookOffset=0.75;
 
-wallPipeOuterDiameter=41.8; 
+wallPipeOuterDiameter=42; //was 41.8
 wallPipeInnerDiameter=41; 
 
 
@@ -16,10 +16,10 @@ exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack - fits pe
 exitPipeInsideDepth=5; 
 
 ourPipeOutsideThickness=4;
-ourPipeOutsideTransitionLength=10;
-ourPipeOutsideLength=5;
+ourPipeOutsideTransitionLength=9;
+ourPipeOutsideLength=4.5;
 ourPipeInsideLength=8.5; 
-ourPipeInsideThickness=3.5;
+ourPipeInsideThickness=3;
 
 epsilon=0.001;
 
@@ -65,8 +65,8 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             //add some grip
             for(i=[0:numberOfCuts-1]) {        
                     rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
-                       translate([exitPipeInsideDiameter/2-7,0,
-                        exitPipeInsideDepth+ourPipeOutsideLength])
+                       translate([exitPipeInsideDiameter/2-7.35,0,
+                        exitPipeInsideDepth+ourPipeOutsideLength-0.5])
                         difference(){
                             scale([0.75,0.75,1])sphere(r=10,$fn=$fn*2/3);
                             rotate(22,[0,-1,0]) {
