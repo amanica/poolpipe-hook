@@ -3,26 +3,25 @@ render=
     //false;
 $fn=render?90:15;
 
-wallRibDepth=15; // depth where the rib is within wall
-wallRibDiameter=32;
+wallRibDepth=16; // was 15 depth where the rib is within wall
 hookTipDepth=7; 
 totalWallPipeDepth=hookTipDepth+wallRibDepth;
-hookOffset=0.50; // was 1 then 0.75; how thick the edge of the hook is that must cath onto the rib
+hookOffset=0.40; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
 hookTipThickness=1.5; // was 1
 gapBetweenHooks=1;
 
-wallPipeOuterDiameter=42.5; //was 41.8 then 42
-wallPipeInnerDiameter=40.75; //was 41
+wallPipeOuterDiameter=43; //was 41.8 then 42 then 42.5
+wallPipeInnerDiameter=40.25; //was 41 then 40.75
 
 
-exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack - fits perfectly!
+exitPipeInsideDiameter=50; // measured 50 but give it a bit of slack - fits perfectly!
 exitPipeInsideDepth=5; 
 
 ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=9;
 ourPipeOutsideLength=4.5;
-ourPipeInsideLength=8.5; 
-ourPipeInsideThickness=4;
+ourPipeInsideLength=7; 
+ourPipeInsideThickness=4.5;
 
 epsilon=0.001;
 
