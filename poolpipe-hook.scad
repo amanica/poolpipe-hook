@@ -3,14 +3,16 @@ render=
     //false;
 $fn=render?90:15;
 
-wallRibDepth=15;
+wallRibDepth=15; // depth where the rib is within wall
 wallRibDiameter=32;
-hookDepth=8; 
-hookOffset=0.75;
+hookTipDepth=7; 
+totalWallPipeDepth=hookTipDepth+wallRibDepth;
+hookOffset=0.50; // was 1 then 0.75; how thick the edge of the hook is that must cath onto the rib
 hookTipThickness=1.5; // was 1
+gapBetweenHooks=1;
 
-wallPipeOuterDiameter=42; //was 41.8
-wallPipeInnerDiameter=41; 
+wallPipeOuterDiameter=42.5; //was 41.8 then 42
+wallPipeInnerDiameter=40.75; //was 41
 
 
 exitPipeInsideDiameter=49.5; // measured 50 but give it a bit of slack - fits perfectly!
@@ -20,14 +22,14 @@ ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=9;
 ourPipeOutsideLength=4.5;
 ourPipeInsideLength=8.5; 
-ourPipeInsideThickness=3;
+ourPipeInsideThickness=4;
 
 epsilon=0.001;
 
 rotateXForPrinting=render?180:0;
 
-numberOfPillars=20;
-numberOfCuts=16;
+//numberOfPillars=20;
+numberOfCuts=12;
 supportRingHeight=0.5;
 
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
@@ -39,8 +41,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
     // ourPipeOutsideTransition
     translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
         pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,
-    t1=ourPipeOutsideThickness, t2=ourPipeInsideThickness);
-     
+    t1=ourPipeOutsideThickness, t2=ourPipeInsideThickness);     
       
     difference(){
         union(){
@@ -51,13 +52,13 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
                 pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth,t=ourPipeInsideThickness);
 
-            // add hooks that can hold onto blue insert       
+            // add hooks that can hold onto rib in wall
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
-                pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookDepth,
+                pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookTipDepth,
                     t1=ourPipeInsideThickness+hookOffset, t2=hookTipThickness);
             
             // add a flat base that must be cut off for the hooks for easier printing
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookDepth])
+            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])
                 pipe(d=wallPipeInnerDiameter,h=supportRingHeight,
                     t=ourPipeInsideThickness);      
             
@@ -83,8 +84,15 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         // cut away to make hooks
         for(i=[0:numberOfCuts-1]) {        
             rotate(360*((i+0)/numberOfCuts)) {
-               translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
-             cube([ourPipeInsideThickness*3,2,wallRibDepth-ourPipeInsideLength+hookDepth+supportRingHeight+epsilon]);
+               translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
+                #union(){
+                    translate([0,0,ourPipeInsideLength])
+                        cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
+                    // make ourPipeInside airodinamic
+                   translate([-ourPipeInsideLength/6,0,0]) 
+                    rotate([0,-45,0]) 
+                      cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);
+                }
             }
         }   
 
@@ -93,18 +101,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         colour("blue")    cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
         +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);*/
         
-      
     }
-
-    // ourPipeInside airodinamics   
-    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
-        pipe(d1=wallPipeOuterDiameter-(wallPipeOuterDiameter/wallPipeInnerDiameter)/5,
-             d2=(wallPipeOuterDiameter+wallPipeInnerDiameter)/2,
-             h=ourPipeInsideLength/2,t1=ourPipeInsideThickness,
-        , t2=hookOffset/2);
-
-    
- 
     
     // some manual support  - rather just cut small slits so we can have 12 hooks    
     /*
@@ -112,7 +109,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
         if (i%5>1 && i%5<4){
             rotate(360*((i+0)/numberOfPillars)) {
                translate([wallPipeInnerDiameter/2-1.5,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
-             cube([2,2,wallRibDepth-ourPipeInsideLength+hookDepth+supportRingHeight]);
+             cube([2,2,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight]);
             }
         }
     }   
