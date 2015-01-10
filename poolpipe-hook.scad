@@ -1,6 +1,6 @@
 render=
-    true;
-    //false;
+    //true;
+    false;
 $fn=render?90:15;
 
 wallRibDepth=16; // was 15 depth where the rib is within wall
@@ -10,9 +10,8 @@ hookOffset=0.40; // was 1 then 0.75, then 0.5; how thick the edge of the hook is
 hookTipThickness=1.5; // was 1
 gapBetweenHooks=1;
 
-wallPipeOuterDiameter=43; //was 41.8 then 42 then 42.5
-wallPipeInnerDiameter=40.25; //was 41 then 40.75
-
+wallPipeOuterDiameter=44; //was 41.8 then 42 then 42.5 then 43
+wallPipeInnerDiameter=40; //was 41 then 40.75 then 40.25
 
 exitPipeInsideDiameter=50; // measured 50 but give it a bit of slack - fits perfectly!
 exitPipeInsideDepth=5; 
