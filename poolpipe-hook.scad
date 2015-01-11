@@ -1,12 +1,13 @@
 render=
-    //true;
-    false;
+    true;
+    //false;
 $fn=render?90:15;
 
 wallRibDepth=16; // was 15 depth where the rib is within wall
+wallRibWidth=5;
 hookTipDepth=7; 
 totalWallPipeDepth=hookTipDepth+wallRibDepth;
-hookOffset=0.50; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
+hookOffset=0.60; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
 hookTipThickness=1.5; // was 1
 gapBetweenHooks=0.2;
 
@@ -35,21 +36,26 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
       
     // ourPipeOutside    
     translate([0,0,exitPipeInsideDepth])        
-        pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t=ourPipeOutsideThickness);  
+        pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t1=ourPipeOutsideThickness, t2=ourPipeOutsideThickness+ourPipeInsideThickness);  
 
     // ourPipeOutsideTransition
     translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
         pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,
-    t1=ourPipeOutsideThickness, t2=ourPipeInsideThickness);     
+    t1=ourPipeOutsideThickness+ourPipeInsideThickness, t2=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness);     
       
     difference(){
         union(){
             
             exitPipeThread();
             
-            // ourPipeInside    
+            // ourPipeInside before rib   
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
-                pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth,t=ourPipeInsideThickness);
+                pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth-wallRibWidth,
+                    t1=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness,t2=ourPipeInsideThickness);
+            
+            // ourPipeInside at rib
+            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth-wallRibWidth])
+                pipe(d=wallPipeInnerDiameter,h=wallRibWidth,t=ourPipeInsideThickness);
 
             // add hooks that can hold onto rib in wall
             translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
@@ -64,12 +70,14 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             //add some grip
             for(i=[0:numberOfCuts-1]) {        
                     rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
-                       translate([exitPipeInsideDiameter/2-7.35,0,
-                        exitPipeInsideDepth+ourPipeOutsideLength-0.5])
-                        difference(){
-                            scale([0.75,0.75,1])sphere(r=10,$fn=$fn*2/3);
-                            rotate(22,[0,-1,0]) {
-                                translate([-5,0,0])cube([20,20,20],center=true);
+                       translate([exitPipeInsideDiameter/2-8.75,0,
+                        exitPipeInsideDepth+ourPipeOutsideLength*2-0.5])
+                        rotate(22,[0,-1,0]) {
+                        difference(){                            
+                            scale([0.5,0.5,1])sphere(r=15,$fn=$fn*2/3);
+                            
+                                
+                                translate([-5,0,0])cube([20,20,30],center=true);
                             }
                         }
                     }
