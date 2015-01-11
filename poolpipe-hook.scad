@@ -6,9 +6,9 @@ $fn=render?90:15;
 wallRibDepth=16; // was 15 depth where the rib is within wall
 hookTipDepth=7; 
 totalWallPipeDepth=hookTipDepth+wallRibDepth;
-hookOffset=0.40; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
+hookOffset=0.50; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
 hookTipThickness=1.5; // was 1
-gapBetweenHooks=1;
+gapBetweenHooks=0.2;
 
 wallPipeOuterDiameter=44; //was 41.8 then 42 then 42.5 then 43
 wallPipeInnerDiameter=40; //was 41 then 40.75 then 40.25
@@ -25,6 +25,7 @@ ourPipeInsideThickness=4.5;
 epsilon=0.001;
 
 rotateXForPrinting=render?180:0;
+cuttawayAngleIncrement=render?0.25:1;
 
 //numberOfPillars=20;
 numberOfCuts=12;
@@ -84,18 +85,21 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
             rotate(360*((i+0)/numberOfCuts)) {
                translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
                 #union(){
-                    translate([0,0,ourPipeInsideLength])
-                        cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
+                    //translate([0,0,ourPipeInsideLength])
+                    //    cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
+                    for(ca=[-2:cuttawayAngleIncrement:2]){
+                        cutaway(ca);
+                    }
                     // make ourPipeInside airodinamic
-                   translate([-ourPipeInsideLength/6,0,0]) 
-                    rotate([0,-45,0]) 
-                      cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);
+                    /*translate([-ourPipeInsideLength/6,0,0]) 
+                        rotate([0,-45,0]) 
+                            cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);*/
                 }
             }
         }   
 
         /*
-        translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
+        translate([0,0,exitPipeInsideDepth+ourPipeOcuttawayAngleIncrementutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
         colour("blue")    cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
         +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);*/
         
@@ -116,8 +120,18 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
     
 }
 
-
-
+module cutaway(angleOffset) {
+    union(){
+   rotate([angleOffset/2,0,angleOffset/2])
+ translate([0,-angleOffset/3*(wallPipeOuterDiameter*PI/360),ourPipeInsideLength])
+    //rotate([0,0,angleOffset])                    
+        cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth*2+supportRingHeight]);   
+    
+    translate([ourPipeInsideLength/10,-angleOffset*3/7*(wallPipeOuterDiameter*PI/360),0]) 
+                        rotate([0,-45,angleOffset/3]) 
+                            cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);
+    }
+}
 /*
 module cutaways(cubeSize, distanceFromCenter){
     
