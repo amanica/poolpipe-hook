@@ -3,16 +3,16 @@ render=
     //false;
 $fn=render?90:15;
 
-wallRibDepth=16; // was 15 depth where the rib is within wall
+wallRibDepth=16+7-3.5; // was 16  ;depth where the rib is within wall
 wallRibWidth=5;
 hookTipDepth=7; 
 totalWallPipeDepth=hookTipDepth+wallRibDepth;
-hookOffset=0.60; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must cath onto the rib
+hookOffset=1; // was 1 then 0.75, then 0.5; how thick the edge of the hook is that must catch onto the rib
 hookTipThickness=1.5; // was 1
 gapBetweenHooks=0.2;
 
-wallPipeOuterDiameter=44; //was 41.8 then 42 then 42.5 then 43
-wallPipeInnerDiameter=40; //was 41 then 40.75 then 40.25
+wallPipeOuterDiameter=44.6; //was 41.8 then 42 then 42.5 then 43
+wallPipeInnerDiameter=39.5; //was 41 then 40.75 then 40.25
 
 exitPipeInsideDiameter=50; // measured 50 but give it a bit of slack - fits perfectly!
 exitPipeInsideDepth=5; 
@@ -20,15 +20,15 @@ exitPipeInsideDepth=5;
 ourPipeOutsideThickness=4;
 ourPipeOutsideTransitionLength=9;
 ourPipeOutsideLength=4.5;
-ourPipeInsideLength=7; 
-ourPipeInsideThickness=4.5;
+ourPipeInsideLength=7+3; 
+ourPipeInsideThickness=5;
 
 epsilon=0.001;
 
 rotateXForPrinting=render?180:0;
+cuttawayAngleMax=2.5;
 cuttawayAngleIncrement=render?0.25:1;
 
-//numberOfPillars=20;
 numberOfCuts=12;
 supportRingHeight=0.5;
 
@@ -63,9 +63,10 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
                     t1=ourPipeInsideThickness+hookOffset, t2=hookTipThickness);
             
             // add a flat base that must be cut off for the hooks for easier printing
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])
-                pipe(d=wallPipeInnerDiameter,h=supportRingHeight,
-                    t=ourPipeInsideThickness);      
+            translate([0,0,
+                exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])
+                pipe(d=wallPipeInnerDiameter+hookOffset*3,h=supportRingHeight,
+                    t=ourPipeInsideThickness+hookOffset*3);      
             
             //add some grip
             for(i=[0:numberOfCuts-1]) {        
@@ -74,8 +75,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
                         exitPipeInsideDepth+ourPipeOutsideLength*2-0.5])
                         rotate(22,[0,-1,0]) {
                         difference(){                            
-                            scale([0.5,0.5,1])sphere(r=15,$fn=$fn*2/3);
-                            
+                            scale([0.5,0.5,1])sphere(r=15,$fn=$fn*2/3);                           
                                 
                                 translate([-5,0,0])cube([20,20,30],center=true);
                             }
@@ -95,7 +95,7 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
                 #union(){
                     //translate([0,0,ourPipeInsideLength])
                     //    cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
-                    for(ca=[-2:cuttawayAngleIncrement:2]){
+                    for(ca=[-cuttawayAngleMax:cuttawayAngleIncrement:cuttawayAngleMax]){
                         cutaway(ca);
                     }
                     // make ourPipeInside airodinamic
