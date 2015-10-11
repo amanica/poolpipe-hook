@@ -1,8 +1,7 @@
-render=
-    true;
-    //false;
+render = true;
+//render = false;
 $fn=render?90:15;
-
+manualSupport=true;
 wallRibDepth=16+7-3.5; // was 16  ;depth where the rib is within wall
 wallRibWidth=5;
 hookTipDepth=7; 
@@ -24,108 +23,154 @@ ourPipeInsideLength=7+3;
 ourPipeInsideThickness=5;
 
 epsilon=0.001;
-
-rotateXForPrinting=render?180:0;
+m=0.2;
+mm=2*m;
+printAngle=20;
+rotateXForPrinting=render?180-printAngle:0
+;
 cuttawayAngleMax=2.5;
 cuttawayAngleIncrement=render?0.25:1;
 
 numberOfCuts=12;
 supportRingHeight=0.5;
-
+printBaseD=wallPipeInnerDiameter+hookOffset*3;
+printBaseH=printBaseD/2*sin(printAngle)+ mm;
+tipDiameter=wallPipeInnerDiameter-hookOffset*2;
+                
 rotate([rotateXForPrinting,0,0]){ // rotate for printing
-      
-    // ourPipeOutside    
-    translate([0,0,exitPipeInsideDepth])        
-        pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t1=ourPipeOutsideThickness, t2=ourPipeOutsideThickness+ourPipeInsideThickness);  
-
-    // ourPipeOutsideTransition
-    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
-        pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,
-    t1=ourPipeOutsideThickness+ourPipeInsideThickness, t2=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness);     
-      
-    difference(){
+    difference(){ // cut away to print small piece
         union(){
-            
-            exitPipeThread();
-            
-            // ourPipeInside before rib   
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
-                pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth-wallRibWidth,
-                    t1=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness,t2=ourPipeInsideThickness);
-            
-            // ourPipeInside at rib
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth-wallRibWidth])
-                pipe(d=wallPipeInnerDiameter,h=wallRibWidth,t=ourPipeInsideThickness);
+        
+            // ourPipeOutside    
+            translate([0,0,exitPipeInsideDepth])        
+                pipe(d=exitPipeInsideDiameter,h=ourPipeOutsideLength,t1=ourPipeOutsideThickness, t2=ourPipeOutsideThickness+ourPipeInsideThickness);  
 
-            // add hooks that can hold onto rib in wall
-            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
-                pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=wallPipeInnerDiameter-hookOffset*2,h=hookTipDepth,
-                    t1=ourPipeInsideThickness+hookOffset, t2=hookTipThickness);
-            
-            // add a flat base that must be cut off for the hooks for easier printing
-            translate([0,0,
-                exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])
-                pipe(d=wallPipeInnerDiameter+hookOffset*3,h=supportRingHeight,
-                    t=ourPipeInsideThickness+hookOffset*3);      
-            
-            //add some grip
-            for(i=[0:numberOfCuts-1]) {        
-                    rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
-                       translate([exitPipeInsideDiameter/2-8.75,0,
-                        exitPipeInsideDepth+ourPipeOutsideLength*2-0.5])
-                        rotate(22,[0,-1,0]) {
+            // ourPipeOutsideTransition
+            translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength])
+                pipe(d1=exitPipeInsideDiameter,d2=wallPipeOuterDiameter,h=ourPipeOutsideTransitionLength,
+            t1=ourPipeOutsideThickness+ourPipeInsideThickness, t2=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness);     
+              
+            // add a flat base that is a little wider 
+            if (manualSupport) {
+                translate([0,-m,
+                    exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])
+                    pipe(d=tipDiameter+2*m ,h=supportRingHeight,
+                        t=hookTipThickness+7*m); 
+            }
+            /*
+                // old flat base that must be cut off for the hooks for easier printing
+                translate([0,0,
+                    exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth + printBaseH  ])
+                    rotate([printAngle,0,0]) {
+                        pipe(d=printBaseD,h=supportRingHeight,
+                            t=ourPipeInsideThickness+hookOffset*3); 
+                    }
+            }*/
+            difference(){
+                union(){
+                    exitPipeThread();
+ 
+                    // ourPipeInside before rib   
+                    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
+                        pipe(d1=wallPipeOuterDiameter,d2=wallPipeInnerDiameter,h=wallRibDepth-wallRibWidth,
+                            t1=(wallPipeOuterDiameter-wallPipeInnerDiameter)/2+ourPipeInsideThickness,t2=ourPipeInsideThickness);
+                    
+                    // ourPipeInside at rib
+                    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth-wallRibWidth])
+                        pipe(d=wallPipeInnerDiameter,h=wallRibWidth,t=ourPipeInsideThickness);
+
+                    // add hooks that can hold onto rib in wall    
+                    translate([0,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth])
+                        pipe(d1=wallPipeInnerDiameter+hookOffset*2,d2=tipDiameter,h=hookTipDepth,
+                            t1=ourPipeInsideThickness+hookOffset, t2=hookTipThickness);
+                    
+                    // supports
+                    if (manualSupport) {
+                        // support base
+                        translate([0,-1,
+                        exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth  + printBaseH                        
+                            ])rotate([printAngle,0,0]) 
+                        /*translate([0,0,
+                            exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])*/
+                            pipe(d=wallPipeInnerDiameter+hookOffset*3,h=supportRingHeight*3,
+                                t=ourPipeInsideThickness+hookOffset*3); 
                         difference(){                            
-                            scale([0.5,0.5,1])sphere(r=15,$fn=$fn*2/3);                           
-                                
-                                translate([-5,0,0])cube([20,20,30],center=true);
+                            translate([0,2.4,
+                        exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth  - printBaseH +1                        
+                            ])
+                            scale([1,0.93,1])
+                                rotate([printAngle,0,0]) 
+                                    pipe(d=tipDiameter,h=printBaseH*2,
+                                        t1=hookTipThickness*2, t2=supportRingHeight); 
+                    
+                            // cut off extra bit
+                            translate([0,0,
+                                exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth-printBaseH*3])
+                                pipe(d=wallPipeInnerDiameter+hookOffset*3,h=printBaseH*3,
+                                    t=ourPipeInsideThickness*2); 
+                        } 
+                    }
+                                        
+                    //add some grip on the sides
+                    for(i=[0:numberOfCuts-1]) {        
+                            rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
+                               translate([exitPipeInsideDiameter/2-8.75,0,
+                                exitPipeInsideDepth+ourPipeOutsideLength*2-0.5])
+                                rotate(22,[0,-1,0]) {
+                                difference(){                            
+                                    scale([0.5,0.5,1]) sphere(r=15,$fn=$fn*2/3);                           
+                                        
+                                        translate([-5,0,0])cube([20,20,30],center=true);
+                                    }
+                                }
                             }
+                        }                       
+                }
+                // inside of threads
+                translate([0,0,-epsilon]) // translate to overlap outer
+                    cylinder(d=exitPipeInsideDiameter-ourPipeOutsideThickness*2,h=exitPipeInsideDepth+2*epsilon);
+                
+                // cut away to make hooks
+                for(i=[0:numberOfCuts-1]) {        
+                    rotate(360*((i+0)/numberOfCuts)) {
+                       translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
+                        #union(){
+                            //translate([0,0,ourPipeInsideLength])
+                            //    cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
+                            for(ca=[-cuttawayAngleMax:cuttawayAngleIncrement:cuttawayAngleMax]){
+                                cutaway(ca);
+                            }
+                            // make ourPipeInside airodinamic
+                            //translate([-ourPipeInsideLength/6,0,0]) 
+                            //       rotate([0,-45,0])
+                            // cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);
                         }
                     }
                 }   
-        }
-        
-        // inside of threads
-        translate([0,0,-epsilon]) // translate to overlap outer
-            cylinder(d=exitPipeInsideDiameter-ourPipeOutsideThickness*2,h=exitPipeInsideDepth+2*epsilon);
-        
-        // cut away to make hooks
-        for(i=[0:numberOfCuts-1]) {        
-            rotate(360*((i+0)/numberOfCuts)) {
-               translate([wallPipeInnerDiameter/3,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength])
-                #union(){
-                    //translate([0,0,ourPipeInsideLength])
-                    //    cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight+epsilon]);
-                    for(ca=[-cuttawayAngleMax:cuttawayAngleIncrement:cuttawayAngleMax]){
-                        cutaway(ca);
+                /*
+                translate([0,0,exitPipeInsideDepth+ourPipeOcuttawayAngleIncrementutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
+                colour("blue")    cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
+                +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);*/
+                
+            }
+            
+            // some manual support  
+            /*
+            for(i=[0:numberOfPillars-1]) {
+                if (i%5>1 && i%5<4){
+                    rotate(360*((i+0)/numberOfPillars)) {
+                       translate([wallPipeInnerDiameter/2-1.5,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
+                     cube([2,2,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight]);
                     }
-                    // make ourPipeInside airodinamic
-                    /*translate([-ourPipeInsideLength/6,0,0]) 
-                        rotate([0,-45,0]) 
-                            cube([ourPipeInsideLength*2,gapBetweenHooks,ourPipeInsideLength*2]);*/
                 }
-            }
-        }   
-
-        /*
-        translate([0,0,exitPipeInsideDepth+ourPipeOcuttawayAngleIncrementutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength/2])
-        colour("blue")    cutaways(cubeSize=wallPipeInnerDiameter/2-1 // make them slightly wider
-        +2*epsilon, distanceFromCenter=wallPipeInnerDiameter*0.36);*/
-        
-    }
-    
-    // some manual support  - rather just cut small slits so we can have 12 hooks    
-    /*
-    for(i=[0:numberOfPillars-1]) {
-        if (i%5>1 && i%5<4){
-            rotate(360*((i+0)/numberOfPillars)) {
-               translate([wallPipeInnerDiameter/2-1.5,0,exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+ourPipeInsideLength])
-             cube([2,2,wallRibDepth-ourPipeInsideLength+hookTipDepth+supportRingHeight]);
-            }
+            }   
+            */
         }
+        
+        // cut away big chunks for tesing infill
+        //rotate([0,0,30]) translate([-50,0,-50]) #cube([100,100,100]);    
+        //rotate([0,0,-30]) translate([-50,0,-50]) #cube([100,100,100]);    
     }   
-    */
-
-    
 }
 
 module cutaway(angleOffset) {
@@ -133,7 +178,10 @@ module cutaway(angleOffset) {
    rotate([angleOffset/2,0,angleOffset/2])
  translate([0,-angleOffset/3*(wallPipeOuterDiameter*PI/360),ourPipeInsideLength])
     //rotate([0,0,angleOffset])                    
-        cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth*2+supportRingHeight]);   
+        cube([ourPipeInsideThickness*3,gapBetweenHooks,wallRibDepth-ourPipeInsideLength+hookTipDepth //*2
+        // + printBaseH +m 
+        +supportRingHeight
+        ]);   
     
     translate([ourPipeInsideLength/10,-angleOffset*3/7*(wallPipeOuterDiameter*PI/360),0]) 
                         rotate([0,-45,angleOffset/3]) 
