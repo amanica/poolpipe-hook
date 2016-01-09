@@ -10,14 +10,14 @@ hookOffset=1; // was 1 then 0.75, then 0.5; how thick the edge of the hook is th
 hookTipThickness=1.5; // was 1
 gapBetweenHooks=0.2;
 
-wallPipeOuterDiameter=44.6; //was 41.8 then 42 then 42.5 then 43
+wallPipeOuterDiameter=45; //was 41.8 then 42 then 42.5 then 43
 wallPipeInnerDiameter=39.5; //was 41 then 40.75 then 40.25
 
 exitPipeInsideDiameter=50; // measured 50 but give it a bit of slack - fits perfectly!
 exitPipeInsideDepth=5; 
 
 ourPipeOutsideThickness=4;
-ourPipeOutsideTransitionLength=9;
+ourPipeOutsideTransitionLength=6;
 ourPipeOutsideLength=4.5;
 ourPipeInsideLength=7+3; 
 ourPipeInsideThickness=5;
@@ -25,7 +25,7 @@ ourPipeInsideThickness=5;
 epsilon=0.001;
 m=0.2;
 mm=2*m;
-printAngle=20;
+printAngle=25;
 rotateXForPrinting=render?180-printAngle:0
 ;
 cuttawayAngleMax=2.5;
@@ -86,41 +86,58 @@ rotate([rotateXForPrinting,0,0]){ // rotate for printing
                     
                     // supports
                     if (manualSupport) {
+                        
+                        /*
+                        NB if you need to mess with this again, 
+                        rather work out the positioning with trig.
+                        the oval thin diameter can be calculated
+                        with the angle and the orig diameter:
+                        cos(angle)*originalDiameter=thinDiameter
+                        */
+                        
                         // support base
-                        translate([0,-1,
-                        exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth  + printBaseH                        
+                        translate([2,-5,
+                        exitPipeInsideDepth+ourPipeOutsideLength +
+                            ourPipeOutsideTransitionLength+wallRibDepth + 
+                            hookTipDepth  + printBaseH -1
                             ])rotate([printAngle,0,0]) 
                         /*translate([0,0,
                             exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth])*/
-                            pipe(d=wallPipeInnerDiameter+hookOffset*3,h=supportRingHeight*3,
+                        
+                            // base on printbed
+                            pipe(d=wallPipeInnerDiameter+hookOffset*3,h=supportRingHeight*4,
                                 t=ourPipeInsideThickness+hookOffset*3); 
                         difference(){                            
                             translate([0,2.4,
-                        exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth  - printBaseH +1                        
+                        exitPipeInsideDepth+ourPipeOutsideLength +
+                            ourPipeOutsideTransitionLength+wallRibDepth
+                            + hookTipDepth  - printBaseH +2                         
                             ])
-                            scale([1,0.93,1])
+                            scale([1,0.90,1])
                                 rotate([printAngle,0,0]) 
+                                    // pipe cut at an angle
                                     pipe(d=tipDiameter,h=printBaseH*2,
                                         t1=hookTipThickness*2, t2=supportRingHeight); 
                     
                             // cut off extra bit
                             translate([0,0,
                                 exitPipeInsideDepth+ourPipeOutsideLength+ourPipeOutsideTransitionLength+wallRibDepth+hookTipDepth-printBaseH*3])
-                                pipe(d=wallPipeInnerDiameter+hookOffset*3,h=printBaseH*3,
-                                    t=ourPipeInsideThickness*2); 
+                                #pipe(d=wallPipeInnerDiameter+hookOffset*3,
+                            h=printBaseH*3,
+                                    t=ourPipeInsideThickness*2.2); 
                         } 
                     }
                                         
                     //add some grip on the sides
                     for(i=[0:numberOfCuts-1]) {        
                             rotate(360*((i+0)/numberOfCuts),[0,0,1]) {
-                               translate([exitPipeInsideDiameter/2-8.75,0,
-                                exitPipeInsideDepth+ourPipeOutsideLength*2-0.5])
-                                rotate(22,[0,-1,0]) {
+                               translate([exitPipeInsideDiameter/2-8.75+0.45,0,
+                                exitPipeInsideDepth+ourPipeOutsideLength*2-0.5-3])
+                                rotate(20,[0,-1,0]) {
                                 difference(){                            
-                                    scale([0.5,0.5,1]) sphere(r=15,$fn=$fn*2/3);                           
+                                    scale([0.5,0.5,0.902]) sphere(r=15,$fn=$fn*2/3);                           
                                         
-                                        translate([-5,0,0])cube([20,20,30],center=true);
+                                        translate([-4,0,0])cube([20,20,30],center=true);
                                     }
                                 }
                             }
